@@ -11,5 +11,11 @@ interface BooleanResult {
 }
 
 export default function createNewAccount(req: NextApiRequest, res: NextApiResponse<BooleanResult>) {
-  res.status(200).json({ result: true });
+  const { username, password }: CreateNewAccountParameters = JSON.parse(req.body);
+
+  if (username === 'notwilson' || password === 'badtest') {
+    res.status(200).json({ result: false });
+  } else {
+    res.status(200).json({ result: true });
+  }
 }
