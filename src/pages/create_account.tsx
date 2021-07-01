@@ -24,11 +24,9 @@ export default function CreateAccount() {
   };
 
   const handleChange = (event: any) => {
-    if (event.target.name === 'username') {
-      setUsername(event.target.value);
-    } else {
-      setPassword(event.target.value);
-    }
+    if (submitError) setSubmitError(false);
+    if (event.target.name === 'username') setUsername(event.target.value);
+    if (event.target.name === 'password') setPassword(event.target.value);
   };
 
   return (
@@ -37,8 +35,9 @@ export default function CreateAccount() {
         <title>Create Account</title>
       </Head>
       <article className={styles.article}>
-        <h1>Create New Account</h1>
         <form className={styles.form} onSubmit={handleSubmit}>
+          <h1>Create New Account</h1>
+          {submitError ? <p>Error!</p> : null}
           <label>
             Username
             <input type='text' name='username' value={username} onChange={handleChange}></input>
