@@ -5,15 +5,16 @@ import styles from 'src/styles/create_account.module.scss';
 export default function CreateAccount() {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
+  const [ submitError, setSubmitError ] = useState(false);
 
   async function handleSubmit(evt: FormEvent) {
     evt.preventDefault();
     const response = await fetch('/api/create_new_account', {
       method: 'POST',
-      body: JSON.stringify({}),
+      body: JSON.stringify({ username, password }),
     });
-
-    console.log(await response.json());
+    const res = await response.json();
+    console.log(res);
   };
 
   const handleChange = (event: any) => {
