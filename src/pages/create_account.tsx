@@ -15,6 +15,12 @@ export default function CreateAccount() {
     });
     const res = await response.json();
     console.log(res);
+
+    if (res.result) {
+      console.log('ready to check if password is exposed');
+    } else {
+      setSubmitError(true);
+    }
   };
 
   const handleChange = (event: any) => {
