@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;700;900&display=swap');
+
 .article {
   width: 100vw;
   height: 100vh;
+  font-family: 'Roboto';
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,9 +11,76 @@
 }
 
 .form {
-  width: 350px;
+  width: 450px;
   box-shadow: 0 2px 14px rgba(0, 0, 0, 0.15);
   padding: 16px;
   border-radius: 16px;
   background: #fff;
+}
+
+.form img,
+.form h1,
+.form p,
+.form label,
+.form button {
+  display: block;
+}
+
+.form label:last-child input {
+  display: inline;
+}
+
+.form h1 {
+  text-align: center;
+  font-size: 2em;
+  font-weight: 900;
+}
+
+.form p {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 300;
+  color: rgb(162, 0, 0);
+}
+
+.form img {
+  max-width: 15%;
+}
+
+.form img,
+.form button {
+  margin: auto;
+}
+
+.form label {
+  margin-bottom: 20px;
+}
+
+.form label input {
+  width: 100%;
+  height: 40px;
+  font-size: 1.5em;
+  border: 0;
+  border-bottom: 1px solid rgb(169, 169, 169);
+}
+
+.form input[type="checkbox"] {
+  width: 25px;
+  font-size: 1em;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.form label input:focus {
+  outline: none;
+}
+
+.form button {
+  width: 100%;
+  height: 60px;
+  border: 0;
+  border-radius: 10px;
+  background-color: #463EBD;
+  color: #fff;
+  font-size: 1.10em;
 }
