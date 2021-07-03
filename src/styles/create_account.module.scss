@@ -84,3 +84,11 @@
   color: #fff;
   font-size: 1.10em;
 }
+
+.form button:hover {
+  background-color: #5c55c4;
+}
+
+.form button:disabled {
+  background-color: #463ebd4d;
+}
