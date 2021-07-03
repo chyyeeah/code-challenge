@@ -15,42 +15,50 @@ export default function CreateAccount() {
   const [ showUsernameToolTip, setShowUsernameToolTip ] = useState(false);
   const [ showPasswordToolTip, setShowPasswordToolTip ] = useState(false);
   const [ exposed, setExposed ] = useState(false);
-  const [ exposedWarning, setExposedWarning] = useState(false);
+  const [ showExposedWarning, setShowExposedWarning] = useState(false);
   const [ bypassWarning, setBypassWarning ] = useState(false);
 
   async function handleSubmit(evt: FormEvent) {
     evt.preventDefault();
+
+    /* Reset general form state */
+    setHasUsernameError(false);
+    setHasPasswordError(false);
     setFormInProgress(true);
-    setExposedWarning(false);
+    setShowExposedWarning(false);
+    setSuccess(false);
+
     try {
-      const rawResponseExposed = await fetch('/api/password_exposed', {
+      const jsonResExposed = await fetch('/api/password_exposed', {
         method: 'POST',
         body: JSON.stringify({ password })
       });
 
-      const resExposed = await rawResponseExposed.json();
-      console.log('exposed', resExposed);
+      const resExposed = await jsonResExposed.json();
       if (resExposed.result && !exposed) {
         setExposed(true);
-        setExposedWarning(true);
+        setShowExposedWarning(true);
         setFormInProgress(false);
       }
 
+      /*
+        Continue to creating the account if..
+          - password is not exposed
+          - user bypasses "exposed password" warning
+      */
       if (!resExposed.result || (exposed && bypassWarning)) {
-        setExposedWarning(false);
-        const rawResponseCreate = await fetch('/api/create_new_account', {
+        setShowExposedWarning(false);
+        const jsonResCreateAccount = await fetch('/api/create_new_account', {
           method: 'POST',
           body: JSON.stringify({ username, password }),
         });
-        const res = await rawResponseCreate.json();
-        console.log('account creation', res);
-        if (res.result) {
-          console.log('account created!');
+        const resCreateAccount = await jsonResCreateAccount.json();
+        if (resCreateAccount.result) {
           setSuccess(true);
           setFormInProgress(false);
         } else {
-          if (res.errors.isUsernameValid) setHasUsernameError(true);
-          if (res.errors.isPasswordValid) setHasPasswordError(true);
+          if (resCreateAccount.errors.isUsernameInvalid) setHasUsernameError(true);
+          if (resCreateAccount.errors.isPasswordInvalid) setHasPasswordError(true);
           setFormInProgress(false);
         }
       }
@@ -63,18 +71,8 @@ export default function CreateAccount() {
   const handleChange = (event: any) => {
     if (exposed) setExposed(false);
     if (bypassWarning) setBypassWarning(false);
-    if (event.target.name === 'username') {
-      if (hasUsernameError) {
-        setHasUsernameError(false);
-      };
-      setUsername(event.target.value);
-    }
-    if (event.target.name === 'password') {
-      if (hasPasswordError) {
-        setHasPasswordError(false);
-      };
-      setPassword(event.target.value);
-    }
+    if (event.target.name === 'username') setUsername(event.target.value);
+    if (event.target.name === 'password') setPassword(event.target.value);
   };
 
   const usernameError = hasUsernameError
@@ -97,6 +95,28 @@ export default function CreateAccount() {
       </span>
     : null;
 
+  const processingError = hasProccessingError
+    ? <p>Error processing request. Please try again.</p>
+    : null;
+
+  const exposedWarning = showExposedWarning
+    ? <p>
+        Warning! Our records show that this password may be been exposed. We recommend that you choose a different password.
+      </p>
+    : null;
+
+  const exposedCheckbox = exposed
+    ? <ExposedBypass
+        bypassWarning={bypassWarning}
+        setBypassWarning={setBypassWarning} />
+    : null;
+
+  const successMessage = success
+    ? <p style={{color: '#000', fontSize: '1.10em'}}>
+        Account Created! Redirecting to Login page...
+      </p>
+    : null;
+
   return (
     <>
       <Head>
@@ -106,8 +126,8 @@ export default function CreateAccount() {
         <form className={styles.form} onSubmit={handleSubmit}>
           <img src="/logo.png" />
           <h1>Create New Account</h1>
-          {hasProccessingError ? <p className='warning'>Error processing request. Please try again.</p> : null}
-          {exposedWarning ? <p className='warning'>Warning! Our records show that this password may be been exposed. We recommend that you choose a different password.</p> : null}
+          {processingError}
+          {exposedWarning}
           <label style={{position: 'relative'}}>
             Username {usernameError}
             <input
@@ -130,13 +150,9 @@ export default function CreateAccount() {
               onBlur={() => setShowPasswordToolTip(false)}
               onKeyPress={(e) => {if (e.key === 'Enter') e.currentTarget.blur()}} ></input>
           </label>
-          {
-            exposed
-            ? <ExposedBypass
-                bypassWarning={bypassWarning}
-                setBypassWarning={setBypassWarning} /> : null}
+          {exposedCheckbox}
           <button name="create-account" disabled={formInProgress}>Create Account</button>
-          {success ? <p style={{color: '#000', fontSize: '1.10em'}}>Account Created! Redirecting to Login page...</p> : null}
+          {successMessage}
         </form>
       </article>
     </>
