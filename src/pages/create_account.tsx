@@ -7,6 +7,8 @@ import styles from 'src/styles/create_account.module.scss';
 export default function CreateAccount() {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
+  const [ formInProgress, setFormInProgress ] = useState(false);
+  const [ success, setSuccess ] = useState(false);
   const [ hasProccessingError, setHasProcessingError ] = useState(false);
   const [ hasUsernameError, setHasUsernameError ] = useState(false);
   const [ hasPasswordError, setHasPasswordError ] = useState(false);
@@ -18,6 +20,7 @@ export default function CreateAccount() {
 
   async function handleSubmit(evt: FormEvent) {
     evt.preventDefault();
+    setFormInProgress(true);
     setExposedWarning(false);
     try {
       const rawResponseExposed = await fetch('/api/password_exposed', {
@@ -27,9 +30,10 @@ export default function CreateAccount() {
 
       const resExposed = await rawResponseExposed.json();
       console.log('exposed', resExposed);
-      if (resExposed.result) {
+      if (resExposed.result && !exposed) {
         setExposed(true);
         setExposedWarning(true);
+        setFormInProgress(false);
       }
 
       if (!resExposed.result || (exposed && bypassWarning)) {
@@ -42,13 +46,17 @@ export default function CreateAccount() {
         console.log('account creation', res);
         if (res.result) {
           console.log('account created!');
+          setSuccess(true);
+          setFormInProgress(false);
         } else {
           if (res.errors.isUsernameValid) setHasUsernameError(true);
           if (res.errors.isPasswordValid) setHasPasswordError(true);
+          setFormInProgress(false);
         }
       }
     } catch (e) {
       setHasProcessingError(true);
+      setFormInProgress(false);
     }
   };
 
@@ -97,10 +105,9 @@ export default function CreateAccount() {
       <article className={styles.article}>
         <form className={styles.form} onSubmit={handleSubmit}>
           <img src="/logo.png" />
-          {/* <Image src={logo} alt='wealthfront logo' /> */}
           <h1>Create New Account</h1>
-          {hasProccessingError ? <p>Error processing request. Please try again.</p> : null}
-          {exposedWarning ? <p>Warning! Our records show that your password may be been exposed. We recommend that you choose a different password.</p> : null}
+          {hasProccessingError ? <p className='warning'>Error processing request. Please try again.</p> : null}
+          {exposedWarning ? <p className='warning'>Warning! Our records show that this password may be been exposed. We recommend that you choose a different password.</p> : null}
           <label style={{position: 'relative'}}>
             Username {usernameError}
             <input
@@ -128,7 +135,8 @@ export default function CreateAccount() {
             ? <ExposedBypass
                 bypassWarning={bypassWarning}
                 setBypassWarning={setBypassWarning} /> : null}
-          <button name="create-account">Create Account</button>
+          <button name="create-account" disabled={formInProgress}>Create Account</button>
+          {success ? <p style={{color: '#000', fontSize: '1.10em'}}>Account Created! Redirecting to Login page...</p> : null}
         </form>
       </article>
     </>
