@@ -18,8 +18,8 @@ export default function createNewAccount(req: NextApiRequest, res: NextApiRespon
 
   if (!isUsernameValid || !isPasswordValid) {
     const errorPayload: Record<string, string> = {};
-    if (!isUsernameValid) errorPayload.isUsernameValid = 'false';
-    if (!isPasswordValid) errorPayload.isPasswordValid = 'false';
+    if (!isUsernameValid) errorPayload.isUsernameInvalid = 'true';
+    if (!isPasswordValid) errorPayload.isPasswordInvalid = 'true';
 
     res.status(200).json({
       result: false,
