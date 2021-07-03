@@ -1,4 +1,4 @@
-import { cleanup, render, screen, fireEvent, act } from '@testing-library/react';
+import { cleanup, render, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import fetchMock from 'jest-fetch-mock';
 import CreateAccount from 'src/pages/create_account';
